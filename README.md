@@ -1,10 +1,9 @@
 # Municipality-year mortality indicators
 
-Run either script from the project:
+Run the R script from the project root:
 
 ```text
-01_mortality_indicators.R"
-01_mortality_indicators.py"
+Programs/R-4.6.1/bin/Rscript.exe "Mortality Index Project/Code/01_mortality_indicators.R"
 ```
 
 The scripts aggregate every municipality found in the municipal variables.
@@ -34,14 +33,55 @@ The analysis will run after the required files are available locally. Users can
 either supply previously downloaded DATASUS files or download them directly in
 R with the [`microdatasus`](https://github.com/rfsaldanha/microdatasus) package.
 
+The example below downloads the four default analysis years for all Brazilian
+states, preprocesses the records, and saves them using filenames recognized by
+the analysis scripts:
+
+```r
+install.packages(c("microdatasus", "data.table"))
+
+library(microdatasus)
+library(data.table)
+
+years <- c(2000, 2005, 2010, 2015)
+dir.create("Raw Data/ETLSINASC", recursive = TRUE, showWarnings = FALSE)
+dir.create("Raw Data/ETLSIM", recursive = TRUE, showWarnings = FALSE)
+
+for (year in years) {
+  sinasc <- fetch_datasus(
+    year_start = year,
+    year_end = year,
+    uf = "all",
+    information_system = "SINASC"
+  )
+  sinasc <- process_sinasc(sinasc)
+  fwrite(
+    sinasc,
+    sprintf("Raw Data/ETLSINASC/ETLSINASC_BR_%d_t.csv", year)
+  )
+
+  sim <- fetch_datasus(
+    year_start = year,
+    year_end = year,
+    uf = "all",
+    information_system = "SIM-DO"
+  )
+  sim <- process_sim(sim)
+  fwrite(
+    sim,
+    sprintf("Raw Data/ETLSIM/ETLSIM_BR_%d_t.csv", year)
+  )
+}
+```
+
 Downloading national microdata can take considerable time and memory. A stable
 internet connection is required, and DATASUS may restrict FTP downloads from
 some countries. For a smaller test, replace `uf = "all"` with one or more state
 codes, such as `uf = "ES"`.
 
-After the files have been saved, run the R or Python indicator script from the
-workspace root. The scripts detect the selected years through `ANALYSIS_YEARS`;
-if it is not set, they use 2000, 2005, 2010, and 2015.
+After the files have been saved, run the R indicator script from the workspace
+root. The script detects the selected years through `ANALYSIS_YEARS`; if it is
+not set, it uses 2000, 2005, 2010, and 2015.
 
 ## Definitions and assumptions
 
@@ -62,12 +102,20 @@ if it is not set, they use 2000, 2005, 2010, and 2015.
 
 The R script uses `geobr::read_municipality()` to obtain the simplified 2020
 municipal boundaries and saves a reusable shapefile under
-`Data/Shapefiles/municipios_2020/`. The Python script reads this local shapefile.
-Both implementations harmonize codes, report unmatched municipalities, and
-save residence-based maps in `Output/Maps`.
+`Data/Shapefiles/municipios_2020/`. It harmonizes municipality codes, reports
+unmatched municipalities, and saves residence-based maps in `Output/Maps`.
 
 The project currently contains the downloaded 2020 layer with 5,570 municipal
 polygons.
+
+## Health regions
+
+The municipality-to-health-region relationship comes from
+`Raw Data/Health Regions BR/tb_ibge.xlsx`. The supplied workbooks contain
+CSV-formatted lines in their first Excel column. In `tb_regiao_saude.xlsx`,
+long hexadecimal WKB geometries are split over several Excel cells; the R
+script reconstructs the 450 records, converts the WKB to `sf`, and saves a
+reusable health-region shapefile under `Data/Shapefiles/regioes_saude/`.
 
 Health-region counts are sums of municipality counts. Rates are recalculated
 from the summed deaths and live births rather than averaging municipal rates.
