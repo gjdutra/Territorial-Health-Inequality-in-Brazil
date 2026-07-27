@@ -1,0 +1,12 @@
+nome_indicador,status_oms,numero_unidades,percentual
+Maternal mortality,Meta atingida,4812,86.3913824057451
+Maternal mortality,No caminho,53,0.951526032315978
+Maternal mortality,Fora do caminho,705,12.657091561939
+Neonatal mortality,Meta atingida,3996,71.7414721723519
+Neonatal mortality,No caminho,437,7.84560143626571
+Neonatal mortality,Fora do caminho,1135,20.3770197486535
+Neonatal mortality,Sem dados suficientes,2,0.0359066427289048
+Under-5 mortality,Meta atingida,4661,83.6804308797128
+Under-5 mortality,No caminho,263,4.72172351885099
+Under-5 mortality,Fora do caminho,645,11.5798922800718
+Under-5 mortality,Sem dados suficientes,1,0.0179533213644524
