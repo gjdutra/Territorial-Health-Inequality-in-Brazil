@@ -34,47 +34,6 @@ The analysis will run after the required files are available locally. Users can
 either supply previously downloaded DATASUS files or download them directly in
 R with the [`microdatasus`](https://github.com/rfsaldanha/microdatasus) package.
 
-The example below downloads the four default analysis years for all Brazilian
-states, preprocesses the records, and saves them using filenames recognized by
-the analysis scripts:
-
-```r
-install.packages(c("microdatasus", "data.table"))
-
-library(microdatasus)
-library(data.table)
-
-years <- c(2000, 2005, 2010, 2015)
-dir.create("Raw Data/ETLSINASC", recursive = TRUE, showWarnings = FALSE)
-dir.create("Raw Data/ETLSIM", recursive = TRUE, showWarnings = FALSE)
-
-for (year in years) {
-  sinasc <- fetch_datasus(
-    year_start = year,
-    year_end = year,
-    uf = "all",
-    information_system = "SINASC"
-  )
-  sinasc <- process_sinasc(sinasc)
-  fwrite(
-    sinasc,
-    sprintf("Raw Data/ETLSINASC/ETLSINASC_BR_%d_t.csv", year)
-  )
-
-  sim <- fetch_datasus(
-    year_start = year,
-    year_end = year,
-    uf = "all",
-    information_system = "SIM-DO"
-  )
-  sim <- process_sim(sim)
-  fwrite(
-    sim,
-    sprintf("Raw Data/ETLSIM/ETLSIM_BR_%d_t.csv", year)
-  )
-}
-```
-
 Downloading national microdata can take considerable time and memory. A stable
 internet connection is required, and DATASUS may restrict FTP downloads from
 some countries. For a smaller test, replace `uf = "all"` with one or more state
