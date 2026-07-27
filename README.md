@@ -1,9 +1,9 @@
 # Municipality-year mortality indicators
 
-Run the R script from the project root:
+Run the R script from the project:
 
 ```text
-Programs/R-4.6.1/bin/Rscript.exe "Mortality Index Project/Code/01_mortality_indicators.R"
+01_mortality_indicators.R
 ```
 
 The scripts aggregate every municipality found in the municipal variables.
@@ -32,47 +32,6 @@ Individual-level SIM and SINASC records are not distributed in this repository.
 The analysis will run after the required files are available locally. Users can
 either supply previously downloaded DATASUS files or download them directly in
 R with the [`microdatasus`](https://github.com/rfsaldanha/microdatasus) package.
-
-The example below downloads the four default analysis years for all Brazilian
-states, preprocesses the records, and saves them using filenames recognized by
-the analysis scripts:
-
-```r
-install.packages(c("microdatasus", "data.table"))
-
-library(microdatasus)
-library(data.table)
-
-years <- c(2000, 2005, 2010, 2015)
-dir.create("Raw Data/ETLSINASC", recursive = TRUE, showWarnings = FALSE)
-dir.create("Raw Data/ETLSIM", recursive = TRUE, showWarnings = FALSE)
-
-for (year in years) {
-  sinasc <- fetch_datasus(
-    year_start = year,
-    year_end = year,
-    uf = "all",
-    information_system = "SINASC"
-  )
-  sinasc <- process_sinasc(sinasc)
-  fwrite(
-    sinasc,
-    sprintf("Raw Data/ETLSINASC/ETLSINASC_BR_%d_t.csv", year)
-  )
-
-  sim <- fetch_datasus(
-    year_start = year,
-    year_end = year,
-    uf = "all",
-    information_system = "SIM-DO"
-  )
-  sim <- process_sim(sim)
-  fwrite(
-    sim,
-    sprintf("Raw Data/ETLSIM/ETLSIM_BR_%d_t.csv", year)
-  )
-}
-```
 
 Downloading national microdata can take considerable time and memory. A stable
 internet connection is required, and DATASUS may restrict FTP downloads from
@@ -109,13 +68,6 @@ The project currently contains the downloaded 2020 layer with 5,570 municipal
 polygons.
 
 ## Health regions
-
-The municipality-to-health-region relationship comes from
-`Raw Data/Health Regions BR/tb_ibge.xlsx`. The supplied workbooks contain
-CSV-formatted lines in their first Excel column. In `tb_regiao_saude.xlsx`,
-long hexadecimal WKB geometries are split over several Excel cells; the R
-script reconstructs the 450 records, converts the WKB to `sf`, and saves a
-reusable health-region shapefile under `Data/Shapefiles/regioes_saude/`.
 
 Health-region counts are sums of municipality counts. Rates are recalculated
 from the summed deaths and live births rather than averaging municipal rates.
