@@ -1,5 +1,6 @@
 # Local data (never publish)
 Data/
+Scripts Examples/
 
 # Downloaded or generated spatial data
 *.shp
