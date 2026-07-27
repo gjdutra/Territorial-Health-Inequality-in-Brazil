@@ -1,0 +1,50 @@
+# Local data (never publish)
+Data/
+
+# Downloaded or generated spatial data
+*.shp
+*.shx
+*.dbf
+*.prj
+*.cpg
+*.gpkg
+
+# Large local data formats
+*.zip
+*.tar.gz
+*.7z
+*.rar
+*.dbc
+*.parquet
+*.rds
+Data/PACKAGES*.txt
+
+# R local state
+.Rhistory
+.RData
+.Ruserdata
+.Rproj.user/
+renv/library/
+
+# Python local state
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+.pytest_cache/
+
+# Credentials and local settings
+.env
+.env.*
+*.key
+*.pem
+credentials.*
+secrets.*
+
+# Temporary and operating-system files
+*.tmp
+*.temp
+~$*
+.DS_Store
+Thumbs.db
