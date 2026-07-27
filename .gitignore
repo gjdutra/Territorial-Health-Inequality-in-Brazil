@@ -27,6 +27,10 @@ Data/PACKAGES*.txt
 .Rproj.user/
 renv/library/
 
+# Local validation reports
+Output/README_data_quality.txt
+Output/validation_log_R.txt
+
 # Python local state
 __pycache__/
 *.py[cod]
