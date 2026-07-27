@@ -1,25 +1,30 @@
 ###################################################################################################
 ###################################################################################################
 
+#### PROJETO: DESIGUALDADE TERRITORIAL EM SAUDE NO BRASIL ####
 #### INDICADORES MUNICIPAIS DE MORTALIDADE - SINASC E SIM ####
 
-# Executar na raiz do projeto:
+rm(list = ls(all.names=TRUE)) # limpar area de trabalho do R
+gc()
+
+## Executar na raiz do projeto:
 # Programs/R-4.6.1/bin/Rscript.exe "Mortality Index Project/Code/01_mortality_indicators.R"
 #
-# Todos os municipios encontrados nas variaveis municipais sao agregados.
+## Todos os municipios encontrados nas variaveis municipais sao agregados.
 
-pacotes <- c("data.table", "dplyr", "tidyr", "stringr", "ggplot2", "sf", "geobr", "readxl")
+######### PACOTES #########
+
+pacotes <- c("tidyverse", "data.table", "sf", "geobr", "readxl")
 faltantes <- pacotes[!sapply(pacotes, requireNamespace, quietly = TRUE)]
 if(length(faltantes) > 0) install.packages(faltantes, repos = "https://cloud.r-project.org")
 
+library(tidyverse)
 library(data.table)
-library(dplyr)
-library(tidyr)
-library(stringr)
-library(ggplot2)
 library(sf)
 library(geobr)
 library(readxl)
+
+######### ENDERECOS E PARAMETROS #########
 
 Endereco_raw <- "Raw Data"
 Endereco_projeto <- "Mortality Index Project"
@@ -38,6 +43,8 @@ anos_analise <- as.integer(str_split(Sys.getenv("ANALYSIS_YEARS", "2000,2005,201
                                      ",", simplify = TRUE))
 arquivo_log <- file.path(Endereco_saida, "validation_log_R.txt")
 writeLines("VALIDACAO - R", arquivo_log)
+
+######### FUNCOES AUXILIARES #########
 
 logar <- function(texto){
   message(texto)
@@ -156,7 +163,8 @@ arquivos_sim <- localizar_arquivos(file.path(Endereco_raw, "ETLSIM"), "ETLSIM")
 if(length(arquivos_sinasc) == 0 | length(arquivos_sim) == 0) stop("Bases SINASC/SIM ausentes.")
 logar(paste("Arquivos SINASC:", length(arquivos_sinasc), "- arquivos SIM:", length(arquivos_sim)))
 
-######### NASCIDOS VIVOS #########
+###################################################################################################
+######### PARTE 1 - NASCIDOS VIVOS (SINASC) #########
 
 resumo_nascimentos <- list()
 contador <- 1
@@ -200,7 +208,8 @@ nascimentos <- rbindlist(resumo_nascimentos, fill = TRUE)[, .(
   municipality_name = first(na.omit(municipality_name))
 ), by = .(municipality_code, year, measure_type)]
 
-######### OBITOS #########
+###################################################################################################
+######### PARTE 2 - OBITOS (SIM) #########
 
 # IDADE conforme dict_SIM.csv:
 # 0 = minutos; 1 = horas; 2 = dias; 3 = meses; 4 = anos.
@@ -278,7 +287,8 @@ obitos <- rbindlist(resumo_obitos, fill = TRUE)[, .(
   municipality_name = first(na.omit(municipality_name))
 ), by = .(municipality_code, year, measure_type)]
 
-######### INDICADORES #########
+###################################################################################################
+######### PARTE 3 - INDICADORES MUNICIPAIS #########
 
 indicadores <- full_join(nascimentos, obitos,
                          by = c("municipality_code", "year", "measure_type"),
@@ -309,7 +319,8 @@ logar(paste("Municipio/ano/tipo com obitos infantis > nascidos vivos:",
 logar(paste("Ausentes - codigo:", sum(is.na(indicadores$municipality_code)),
             "- ano:", sum(is.na(indicadores$year))))
 
-######### REGIOES DE SAUDE #########
+###################################################################################################
+######### PARTE 4 - REGIOES DE SAUDE #########
 
 # Os arquivos XLSX fornecidos guardam linhas CSV em uma unica coluna.
 # tb_ibge possui exatamente os 5.570 municipios atuais e e usado como crosswalk.
@@ -384,7 +395,8 @@ indicadores_regiao <- indicadores_regiao %>%
 
 fwrite(indicadores_regiao,
        file.path(Endereco_saida, "mortality_indicators_health_region_year_R.csv"))
-######### MAPAS #########
+###################################################################################################
+######### PARTE 5 - MAPAS MUNICIPAIS #########
 
 Endereco_shape <- file.path(Endereco_dados, "Shapefiles", "municipios_2020")
 dir.create(Endereco_shape, recursive = TRUE, showWarnings = FALSE)
@@ -439,7 +451,8 @@ if(file.exists(arquivo_shape)){
   logar("AVISO MAPA: shapefile municipal nao foi criado.")
 }
 
-######### MAPAS - REGIOES DE SAUDE #########
+###################################################################################################
+######### PARTE 6 - MAPAS DAS REGIOES DE SAUDE #########
 
 # A geometria vem como WKB hexadecimal, dividida em varias celulas do XLSX.
 texto_regioes <- readxl::read_excel(arquivo_regioes, col_names = FALSE)[[1]]
@@ -504,7 +517,8 @@ for(ano_ref in sort(unique(principal_regiao$year))){
   }
 }
 
-######### GRAFICOS DAS METAS OMS #########
+###################################################################################################
+######### PARTE 7 - GRAFICOS DAS METAS OMS #########
 
 script_metas_oms <- file.path(Endereco_projeto, "Code", "02_who_goal_progress.R")
 if(file.exists(script_metas_oms)){
@@ -512,3 +526,6 @@ if(file.exists(script_metas_oms)){
 } else {
   logar("AVISO OMS: script 02_who_goal_progress.R nao encontrado.")
 }
+
+###################################################################################################
+###################################################################################################
