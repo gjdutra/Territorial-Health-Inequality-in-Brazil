@@ -1,4 +1,4 @@
-# Municipality-year mortality indicators
+# Municipality-year health indicators
 
 Run the R script from the project:
 
