@@ -12,7 +12,7 @@ Outputs are written to `Output/`.
 The default analysis years are 2000, 2005, 2010, and 2015. Override them with
 the comma-separated environment variable `ANALYSIS_YEARS`.
 
-Additionally, the script analyzes and displays which regions are on track to meet the WHO's maternal and child mortality reduction targets.
+Additionally, the script below analyzes and displays which regions are on track to meet the WHO's maternal and child mortality reduction targets:
 
 ```text
 02_who_goal_progress.R
