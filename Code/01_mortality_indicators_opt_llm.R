@@ -7,11 +7,6 @@
 rm(list = ls(all.names=TRUE)) # limpar area de trabalho do R
 gc()
 
-## Executar na raiz do projeto:
-# Programs/R-4.6.1/bin/Rscript.exe "Mortality Index Project/Code/01_mortality_indicators.R"
-#
-## Todos os municipios encontrados nas variaveis municipais sao agregados.
-
 ######### PACOTES #########
 
 pacotes <- c("tidyverse", "data.table", "sf", "geobr", "readxl")
